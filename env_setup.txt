@@ -1,0 +1,19 @@
+------------------
+# arch setup
+# cuda
+sudo pacman -S cuda
+nvcc --version
+
+# mpi
+sudo pacman -S openmpi
+mpicxx --version
+mpirun --version
+
+# opengl
+sudo pacman -S mesa mesa-utils freeglut glew glfw-x11
+glxinfo | grep "OpenGL"
+
+export PATH=/usr/lib/openmpi/bin:$PATH
+export LD_LIBRARY_PATH=/usr/lib/openmpi/lib:$LD_LIBRARY_PATH
+------------------
+
