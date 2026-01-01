@@ -1,0 +1,17 @@
+# how it works
+
+# pthreads, cuda threads, opengl, no mpi
+
+-  cpu thread a: simulation
+-> force and other computations
+-> update positions
+-> uses cuda threads for this
+-> runs until ctrl+z or interrupt flag
+
+-  cpu thread b: opengl
+-> cuda and opengl
+
+communiate via buffer ring and have atomic writer_index and atomic reader_index so that 
+writer_index - reader_index < N
+writer_index and reader_index increase by 1 forever until overflow (go back to 0, maybe need special handling case for this).
+This ensures the diff btw the writer and reader does not increase over the capacity of the buffer ring.

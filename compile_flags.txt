@@ -1,0 +1,2 @@
+-I/opt/cuda/include
+-std=c++17

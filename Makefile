@@ -2,39 +2,47 @@ SRC_DIR := src
 OBJ_DIR := build
 BIN_DIR := bin
 
+EXEC := $(BIN_DIR)/nbody
+
+NVCC := /opt/cuda/bin/nvcc
+CXX  := g++
+
 CUDA_SRCS := $(wildcard $(SRC_DIR)/*.cu)
 CPP_SRCS  := $(wildcard $(SRC_DIR)/*.cpp)
 
-OBJS := $(patsubst $(SRC_DIR)/%.cu,$(OBJ_DIR)/%.o,$(CUDA_SRCS)) \
-        $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(CPP_SRCS))
+CU_OBJS  := $(CUDA_SRCS:$(SRC_DIR)/%.cu=$(OBJ_DIR)/%.o)
+CPP_OBJS := $(CPP_SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
+OBJS := $(CU_OBJS) $(CPP_OBJS)
 
-EXEC := $(BIN_DIR)/nbody
+INC := -I$(SRC_DIR) -I/opt/cuda/include
 
-INC := $(SRC_DIR)
+NVCCFLAGS := -O2 $(INC)
+CXXFLAGS  := -O2 -Wall $(INC)
 
-DEBUG ?= 0
-OPTS = -O3 -Wall
+DEBUG ?= 1
 ifeq ($(DEBUG),1)
-    OPTS += -DDEBUG
+    NVCCFLAGS += -DDEBUG -g
+    CXXFLAGS  += -DDEBUG -g
 endif
 
-$(shell mkdir -p $(OBJ_DIR))
-$(shell mkdir -p $(BIN_DIR))
+$(shell mkdir -p $(OBJ_DIR) $(BIN_DIR))
 
 all: $(EXEC)
 
 # cuda
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cu
-	nvcc -c $< -o $@ $(OPTS) -I$(INC)
+	$(NVCC) -c $< -o $@ $(NVCCFLAGS)
 
-# mpi/cpp
+# cpp
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	mpicxx -c $< -o $@ $(OPTS) -I$(INC)
+	$(CXX) -c $< -o $@ $(CXXFLAGS)
 
 # linker
 $(EXEC): $(OBJS)
-	mpicxx $(OBJS) -L/opt/cuda/lib64 -lcudart -o $@
+	$(NVCC) $^ -o $@ -lcudart -lpthread
 
 clean:
-	rm -f $(OBJS) $(EXEC)
+	rm -f $(OBJ_DIR)/*.o $(EXEC)
+
+.PHONY: all clean
 

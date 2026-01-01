@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <cstdlib>
 
+#include "particle.h"
+
 #define REG_ARG_COUNT 4
 
 void get_args(struct args_t* args, int argc, char** argv)
@@ -26,6 +28,8 @@ void get_args(struct args_t* args, int argc, char** argv)
         {0, 0, 0, 0}
     };
 
+    int req_args[REG_ARG_COUNT] = {0};
+
     int opt;
     while ((opt = getopt_long(argc, argv, "i:o:d:t:v::b::h::", l_opts, NULL)) != -1)
     {
@@ -33,15 +37,19 @@ void get_args(struct args_t* args, int argc, char** argv)
         {
             case 'i': 
                 args->input_file = optarg; 
+                req_args[0] = 1;
                 break;
             case 'o': 
                 args->output_file = optarg; 
+                req_args[1] = 1;
                 break;
             case 'd': 
                 args->dt = atof(optarg); 
+                req_args[2] = 1;
                 break;
             case 't': 
                 args->theta = atof(optarg); 
+                req_args[3] = 1;
                 break;
             case 'v': 
                 args->verbose = true; 
@@ -71,8 +79,6 @@ void get_args(struct args_t* args, int argc, char** argv)
         exit(0);
     }
 
-    int req_args[REG_ARG_COUNT] = {0};
-
     for (int i = 0; i < REG_ARG_COUNT; ++i)
     {
         if (req_args[i] == 0)
@@ -91,3 +97,8 @@ void get_args(struct args_t* args, int argc, char** argv)
     }
 }
 
+void input_particles(Particle** particles, struct args_t args)
+{
+    int n_particles = 0;
+    *particles = (Particle*) malloc(sizeof(Particle) * n_particles);
+}

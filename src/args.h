@@ -1,5 +1,7 @@
 #pragma once
 
+#include "particle.h"
+
 typedef struct args_t 
 {
     double theta;       // threshold for approximation
@@ -12,4 +14,6 @@ typedef struct args_t
 } args;
 
 void get_args(struct args_t* args, int argc, char** argv);
+void input_particles(Particle** particles, struct args_t args);
+
 
