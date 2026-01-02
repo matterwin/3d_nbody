@@ -37,9 +37,9 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cu
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) -c $< -o $@ $(CXXFLAGS)
 
-# linker
+# linker: cuda, cpp, opengl
 $(EXEC): $(OBJS)
-	$(NVCC) $^ -o $@ -lcudart -lpthread
+	$(NVCC) $^ -o $@ -lcudart -lpthread -lGL -lGLU -lglut
 
 clean:
 	rm -f $(OBJ_DIR)/*.o $(EXEC)

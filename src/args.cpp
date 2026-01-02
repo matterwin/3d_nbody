@@ -2,6 +2,7 @@
 #include <getopt.h>
 #include <stdio.h>
 #include <cstdlib>
+#include <fstream>
 
 #include "particle.h"
 
@@ -17,7 +18,8 @@ void get_args(struct args_t* args, int argc, char** argv)
     args->verbose = false;
     args->help = false;
 
-    struct option l_opts[] = {
+    struct option l_opts[] = 
+    {
         {"input",   required_argument, 0, 'i'},
         {"output",  required_argument, 0, 'o'},
         {"dt",      required_argument, 0, 'd'},
@@ -97,8 +99,35 @@ void get_args(struct args_t* args, int argc, char** argv)
     }
 }
 
-void input_particles(Particle** particles, struct args_t args)
+void input_particles(Particle** particles, struct args_t args, int* n_particles)
 {
-    int n_particles = 0;
-    *particles = (Particle*) malloc(sizeof(Particle) * n_particles);
+    std::ifstream in;
+    in.open(args.input_file);
+    if (!in)
+    {
+        printf("Couldn't read input_file %s\n", args.input_file ? args.input_file : "None");
+        fflush(stdout);
+        exit(1);
+    }
+
+    in >> *n_particles;
+    *particles = (Particle*) malloc(*n_particles * sizeof(Particle));
+
+    for (int i = 0; i < *n_particles; ++i)
+    {
+		in >> (*particles)[i].idx
+        >> (*particles)[i].px
+        >> (*particles)[i].py
+        >> (*particles)[i].pz
+        >> (*particles)[i].mass
+        >> (*particles)[i].vx
+        >> (*particles)[i].vy
+        >> (*particles)[i].vz;
+
+        (*particles)[i].fx = 0;
+        (*particles)[i].fy = 0;
+        (*particles)[i].fz = 0;
+    }
+
+    in.close();
 }
